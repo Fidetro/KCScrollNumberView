@@ -42,7 +42,7 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
 
 - (void)commonInit
 {
-    self.duration = 0.2;
+    self.duration = 0.1;
     self.minLength = 0;
     
     self.font = [UIFont systemFontOfSize:[UIFont systemFontSize]];
@@ -155,11 +155,15 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
         scrollLayer.name = kFallLayerName;
     }else if (number<lastNumber)
     {
-        for(NSInteger i = lastNumber-1; i >= number; i--)
+        for(NSInteger i = lastNumber;; i++)
         {
-            [textForScroll addObject:[NSString stringWithFormat:@"%ld", i % 10]];
+            [textForScroll insertObject:[NSString stringWithFormat:@"%ld", i % 10] atIndex:0];
+            if (number == (i%10)) {
+                break;
+            }
         }
-        scrollLayer.name = kAscendLayerName;
+        
+        scrollLayer.name = kFallLayerName;
     }else{
         [textForScroll addObject:numberText];
         
