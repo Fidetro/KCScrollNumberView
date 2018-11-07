@@ -152,6 +152,7 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
         {
             [textForScroll addObject:[NSString stringWithFormat:@"%ld", i % 10]];
         }
+        scrollLayer.hidden = YES;
         scrollLayer.name = kFallLayerName;
     }else if (number<lastNumber)
     {
@@ -164,12 +165,13 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
         }
         
         scrollLayer.name = kFallLayerName;
+        scrollLayer.hidden = YES;
     }else{
         [textForScroll addObject:numberText];
-        
+        scrollLayer.hidden = NO;
         scrollLayer.name = kNormalLayerName;
     }
-    scrollLayer.hidden = YES;
+    
     
     
     
