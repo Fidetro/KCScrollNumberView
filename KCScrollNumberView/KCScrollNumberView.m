@@ -156,12 +156,9 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
         scrollLayer.name = kFallLayerName;
     }else if (number<lastNumber)
     {
-        for(NSInteger i = lastNumber;; i++)
+        for(NSInteger i = lastNumber;number<=i; i--)
         {
             [textForScroll insertObject:[NSString stringWithFormat:@"%ld", i % 10] atIndex:0];
-            if (number == (i%10)) {
-                break;
-            }
         }
         
         scrollLayer.name = kFallLayerName;

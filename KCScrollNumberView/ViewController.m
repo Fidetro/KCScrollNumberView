@@ -25,11 +25,11 @@
     
 }
 - (IBAction)aAction:(id)sender {
-    self.numberView.value = @(43);
+    self.numberView.value = @(123);
     [self.numberView startAnimation];
 }
 - (IBAction)bAction:(id)sender {
-    self.numberView.value = @(42);
+    self.numberView.value = @(3456);
     [self.numberView startAnimation];
 }
 
