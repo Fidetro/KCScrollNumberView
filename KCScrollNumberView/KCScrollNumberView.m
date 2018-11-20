@@ -16,6 +16,7 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
 @property (nonatomic, strong) NSMutableArray *lastNumbersText;
 @property (nonatomic, strong) NSMutableArray *scrollLayers;
 @property (nonatomic, strong) NSMutableArray *scrollLabels;
+@property (nonatomic, strong) NSMutableArray *originLabels;
 @property (nonatomic, strong) NSNumber *lastValue;
 @end
 @implementation KCScrollNumberView
@@ -48,6 +49,7 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
     self.font = [UIFont systemFontOfSize:[UIFont systemFontSize]];
     self.textColor = [UIColor blackColor];
     
+    self.originLabels = [NSMutableArray new];
     self.numbersText = [NSMutableArray new];
     self.lastNumbersText = [NSMutableArray new];
     self.scrollLayers = [NSMutableArray new];
@@ -89,11 +91,15 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
         [layer removeFromSuperlayer];
     }
     
+    for (UILabel *label in self.originLabels) {
+        [label removeFromSuperview];
+    }
+    
     [self.numbersText removeAllObjects];
     [self.lastNumbersText removeAllObjects];
     [self.scrollLayers removeAllObjects];
     [self.scrollLabels removeAllObjects];
-    
+    [self.originLabels removeAllObjects];
     [self createNumbersText];
     [self createScrollLayers];
 }
@@ -128,6 +134,7 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
         layer.frame = CGRectMake(roundf(i * width), 0, width, height);
         [self.scrollLayers addObject:layer];
         [self.layer addSublayer:layer];
+
     }
     
     for(NSUInteger i = 0; i < self.numbersText.count; ++i){
@@ -135,8 +142,17 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
         NSString *numberText = self.numbersText[i];
         NSString *lastNumbersText = self.lastNumbersText[self.lastNumbersText.count-self.numbersText.count+i];
         [self createContentForLayer:layer withNumberText:numberText lastNumberText:lastNumbersText];
+        UILabel *label = [[UILabel alloc] init];
+        label.font = self.font;
+        label.textColor = self.textColor;
+        label.text = lastNumbersText;
+        label.textAlignment = NSTextAlignmentCenter;
+        [self.originLabels addObject:label];
+        [self addSubview:label];
+        label.frame = CGRectMake(roundf(i * width), 0, width, height);
     }
 }
+
 
 - (void)createContentForLayer:(CAScrollLayer *)scrollLayer withNumberText:(NSString *)numberText lastNumberText:(NSString *)lastNumberText
 {
@@ -197,6 +213,8 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
     if (index < 0) {
         return;
     }
+    UILabel *label =  self.originLabels[index];
+    label.hidden = YES;
     CALayer *scrollLayer = scrollLayers[index];
     scrollLayer.hidden = NO;
     
