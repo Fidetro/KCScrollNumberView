@@ -25,4 +25,6 @@
 - (void)stopAnimation;
 /** 延迟delay秒执行动画 **/
 - (void)startAnimationAfterDelay:(NSTimeInterval)delay;
+/** 只改变数字，不执行动画 **/
+- (void)unAnimation;
 @end

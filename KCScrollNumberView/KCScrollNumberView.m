@@ -73,6 +73,11 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
     [self prepareAnimations];
     [self createSortAnimationsWithIndex:self.scrollLayers.count-1 scrollLayers:[self.scrollLayers mutableCopy]];
 }
+- (void)unAnimation
+{
+    self.lastValue = self.value;
+    [self startAnimation];
+}
 
 - (void)startAnimationAfterDelay:(NSTimeInterval)delay
 {
