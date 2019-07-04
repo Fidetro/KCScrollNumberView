@@ -8,6 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
+typedef enum : NSUInteger {    
+    KCScrollTypeQueue,  //队列滚动
+    KCScrollTypeSync,   //同时滚动
+} KCScrollType;
+
 @interface KCScrollNumberView : UIView
 /** 最后显示的值 **/
 @property (nonatomic, strong) NSNumber *value;
@@ -19,12 +24,33 @@
 @property (nonatomic, assign) CFTimeInterval duration;
 /** 最小展示位数,不足补零 **/
 @property (nonatomic, assign) NSUInteger minLength;
-/** 开始执行动画 **/
+/** 滚动类型 **/
+@property (nonatomic, assign) KCScrollType scrollType;
+
+/**
+ 开始执行动画
+ */
 - (void)startAnimation;
-/** 结束执行动画 **/
+
+/**
+ 结束执行动画
+ */
 - (void)stopAnimation;
-/** 延迟delay秒执行动画 **/
+
+/**
+ 延迟delay秒执行动画
+
+ @param delay 延迟秒数
+ */
 - (void)startAnimationAfterDelay:(NSTimeInterval)delay;
-/** 只改变数字，不执行动画 **/
+
+/**
+ 只改变数字，不执行动画
+ */
 - (void)unAnimation;
+
+/**
+ 随机滚动，仅在 KCScrollTypeSync 滚动模式才有用
+ */
+- (void)randomCycleAnimation;
 @end

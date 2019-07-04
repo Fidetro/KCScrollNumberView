@@ -18,6 +18,7 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
 @property (nonatomic, strong) NSMutableArray *scrollLabels;
 @property (nonatomic, strong) NSMutableArray *originLabels;
 @property (nonatomic, strong) NSNumber *lastValue;
+@property (nonatomic, assign) BOOL isCycle;
 @end
 @implementation KCScrollNumberView
 
@@ -70,9 +71,32 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
 
 - (void)startAnimation
 {
+    self.isCycle = NO;
     [self prepareAnimations];
-    [self createSortAnimationsWithIndex:self.scrollLayers.count-1 scrollLayers:[self.scrollLayers mutableCopy]];
+    if (self.scrollType == KCScrollTypeQueue) {
+        [self createSortAnimationsWithIndex:self.scrollLayers.count-1 scrollLayers:[self.scrollLayers mutableCopy]];
+    }else{
+        for (int i = 0; i<self.scrollLayers.count; i++) {
+            @autoreleasepool {
+                [self createSortAnimationsWithIndex:i scrollLayers:[self.scrollLayers mutableCopy]];
+            }
+        }
+    }
 }
+
+- (void)randomCycleAnimation
+{
+    NSAssert(self.scrollType == KCScrollTypeSync,@"随机滚动，仅在 KCScrollTypeSync 滚动模式才有用");
+    
+    self.isCycle = YES;
+    [self prepareAnimations];
+    for (int i = 0; i<self.scrollLayers.count; i++) {
+        @autoreleasepool {
+            [self createSortAnimationsWithIndex:i scrollLayers:[self.scrollLayers mutableCopy]];
+        }
+    }
+}
+
 - (void)unAnimation
 {
     self.lastValue = self.value;
@@ -86,18 +110,24 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
 - (void)stopAnimation
 {
     for(CALayer *layer in self.scrollLayers){
-        [layer removeAnimationForKey:kAniamtionKey];
+        @autoreleasepool {
+            [layer removeAnimationForKey:kAniamtionKey];
+        }
     }
 }
 
 - (void)prepareAnimations
 {
-    for(CALayer *layer in self.scrollLayers){
-        [layer removeFromSuperlayer];
+    for(CALayer *layer in self.scrollLayers) {
+        @autoreleasepool {
+            [layer removeFromSuperlayer];
+        }
     }
     
     for (UILabel *label in self.originLabels) {
-        [label removeFromSuperview];
+        @autoreleasepool {
+            [label removeFromSuperview];
+        }
     }
     
     [self.numbersText removeAllObjects];
@@ -113,19 +143,27 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
 {
     NSString *textValue = [self.value stringValue];
     NSString *lastTextValue = [self.lastValue stringValue];
-    for(NSInteger i = 0; i < (NSInteger)self.minLength - (NSInteger)[textValue length]; ++i){
-        [self.numbersText addObject:@"0"];
+    for(NSInteger i = 0; i < (NSInteger)self.minLength - (NSInteger)[textValue length]; ++i) {
+        @autoreleasepool {
+            [self.numbersText addObject:@"0"];
+        }
     }
     
-    for(NSUInteger i = 0; i < [textValue length]; ++i){
-        [self.numbersText addObject:[textValue substringWithRange:NSMakeRange(i, 1)]];
+    for(NSUInteger i = 0; i < [textValue length]; ++i) {
+        @autoreleasepool {
+            [self.numbersText addObject:[textValue substringWithRange:NSMakeRange(i, 1)]];
+        }
     }
     
-    for(NSUInteger i = 0; i < [lastTextValue length]; ++i){
-        [self.lastNumbersText addObject:[lastTextValue substringWithRange:NSMakeRange(i, 1)]];
+    for(NSUInteger i = 0; i < [lastTextValue length]; ++i) {
+        @autoreleasepool {
+            [self.lastNumbersText addObject:[lastTextValue substringWithRange:NSMakeRange(i, 1)]];
+        }
     }
-    for(NSUInteger i = [lastTextValue length]; i < self.numbersText.count; ++i){
-        [self.lastNumbersText insertObject:@"0" atIndex:0];
+    for(NSUInteger i = [lastTextValue length]; i < self.numbersText.count; ++i) {
+        @autoreleasepool {
+            [self.lastNumbersText insertObject:@"0" atIndex:0];
+        }
     }
 }
 
@@ -134,27 +172,30 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
     CGFloat width = roundf(CGRectGetWidth(self.frame) / self.numbersText.count);
     CGFloat height = CGRectGetHeight(self.frame);
     
-    for(NSUInteger i = 0; i < self.numbersText.count; ++i){
-        CAScrollLayer *layer = [CAScrollLayer layer];
-        layer.frame = CGRectMake(roundf(i * width), 0, width, height);
-        [self.scrollLayers addObject:layer];
-        [self.layer addSublayer:layer];
-
+    for(NSUInteger i = 0; i < self.numbersText.count; ++i) {
+        @autoreleasepool {
+            CAScrollLayer *layer = [CAScrollLayer layer];
+            layer.frame = CGRectMake(roundf(i * width), 0, width, height);
+            [self.scrollLayers addObject:layer];
+            [self.layer addSublayer:layer];
+        }
     }
     
-    for(NSUInteger i = 0; i < self.numbersText.count; ++i){
-        CAScrollLayer *layer = self.scrollLayers[i];
-        NSString *numberText = self.numbersText[i];
-        NSString *lastNumbersText = self.lastNumbersText[self.lastNumbersText.count-self.numbersText.count+i];
-        [self createContentForLayer:layer withNumberText:numberText lastNumberText:lastNumbersText];
-        UILabel *label = [[UILabel alloc] init];
-        label.font = self.font;
-        label.textColor = self.textColor;
-        label.text = lastNumbersText;
-        label.textAlignment = NSTextAlignmentCenter;
-        [self.originLabels addObject:label];
-        [self addSubview:label];
-        label.frame = CGRectMake(roundf(i * width), 0, width, height);
+    for(NSUInteger i = 0; i < self.numbersText.count; ++i) {
+        @autoreleasepool {
+            CAScrollLayer *layer = self.scrollLayers[i];
+            NSString *numberText = self.numbersText[i];
+            NSString *lastNumbersText = self.lastNumbersText[self.lastNumbersText.count-self.numbersText.count+i];
+            [self createContentForLayer:layer withNumberText:numberText lastNumberText:lastNumbersText];
+            UILabel *label = [[UILabel alloc] init];
+            label.font = self.font;
+            label.textColor = self.textColor;
+            label.text = lastNumbersText;
+            label.textAlignment = NSTextAlignmentCenter;
+            [self.originLabels addObject:label];
+            [self addSubview:label];
+            label.frame = CGRectMake(roundf(i * width), 0, width, height);
+        }
     }
 }
 
@@ -171,7 +212,9 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
         
         for(NSInteger i = number-1; i >= lastNumber; i--)
         {
-            [textForScroll addObject:[NSString stringWithFormat:@"%ld", i % 10]];
+            @autoreleasepool {
+                [textForScroll addObject:[NSString stringWithFormat:@"%ld", i % 10]];
+            }
         }
         scrollLayer.hidden = YES;
         scrollLayer.name = kFallLayerName;
@@ -179,7 +222,9 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
     {
         for(NSInteger i = lastNumber;number<=i; i--)
         {
-            [textForScroll insertObject:[NSString stringWithFormat:@"%ld", i % 10] atIndex:0];
+            @autoreleasepool {
+                [textForScroll insertObject:[NSString stringWithFormat:@"%ld", i % 10] atIndex:0];
+            }
         }
         
         scrollLayer.name = kFallLayerName;
@@ -194,12 +239,14 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
     
     
     CGFloat height = 0;
-    for(NSString *text in textForScroll){
-        UILabel * textLabel = [self createLabel:text];
-        textLabel.frame = CGRectMake(0, height, CGRectGetWidth(scrollLayer.frame), CGRectGetHeight(scrollLayer.frame));
-        [scrollLayer addSublayer:textLabel.layer];
-        [self.scrollLabels addObject:textLabel];
-        height = CGRectGetMaxY(textLabel.frame);
+    for(NSString *text in textForScroll) {
+        @autoreleasepool {
+            UILabel * textLabel = [self createLabel:text];
+            textLabel.frame = CGRectMake(0, height, CGRectGetWidth(scrollLayer.frame), CGRectGetHeight(scrollLayer.frame));
+            [scrollLayer addSublayer:textLabel.layer];
+            [self.scrollLabels addObject:textLabel];
+            height = CGRectGetMaxY(textLabel.frame);
+        }
     }
 }
 
@@ -249,9 +296,18 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
         animation.fromValue = [NSNumber numberWithFloat:-maxY];
         animation.toValue = @0;
     }
-    
+    __weak typeof(self) weakself = self;
     [CATransaction setCompletionBlock:^{
-        [self createSortAnimationsWithIndex:index-1 scrollLayers:scrollLayers];
+        if (self.scrollType == KCScrollTypeQueue)
+        {
+            [self createSortAnimationsWithIndex:index-1 scrollLayers:scrollLayers];
+        }else
+        {
+            if (weakself.isCycle == YES)
+            {
+                [weakself createSortAnimationsWithIndex:index scrollLayers:scrollLayers];
+            }
+        }
     }];
     [scrollLayer addAnimation:animation forKey:kAniamtionKey];
     [CATransaction commit];

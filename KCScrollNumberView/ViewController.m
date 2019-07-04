@@ -25,17 +25,22 @@
     
 }
 - (IBAction)aAction:(id)sender {
-    self.numberView.value = @(113);
+    self.numberView.value = @(123);
     [self.numberView startAnimation];
 }
 - (IBAction)bAction:(id)sender {
-    self.numberView.value = @(120);
+    self.numberView.value = @(3456);
     [self.numberView startAnimation];
 }
 
 - (IBAction)cAction:(id)sender {
     self.numberView.value = @(13456);
     [self.numberView startAnimation];
+}
+- (IBAction)randomAction:(id)sender {
+    self.numberView.value = @(99999);
+    self.numberView.scrollType = KCScrollTypeSync;
+    [self.numberView randomCycleAnimation];
 }
 
 
