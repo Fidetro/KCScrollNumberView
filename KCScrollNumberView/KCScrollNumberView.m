@@ -165,7 +165,13 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
     }
     for(NSUInteger i = [lastTextValue length]; i < self.numbersText.count; ++i) {
         @autoreleasepool {
-            [self.lastNumbersText insertObject:@"0" atIndex:0];
+            NSString *numString = [self.numbersText fa_objectAtIndexSafe:i];
+            NSString *checkedNumString = [numString stringByTrimmingCharactersInSet:[NSCharacterSet decimalDigitCharacterSet]];
+            if ([checkedNumString length] > 0) {
+                [self.lastNumbersText fa_insertObjectSafe:numString atIndex:0];
+            } else {
+                [self.lastNumbersText fa_insertObjectSafe:@"0" atIndex:0];
+            }
         }
     }
 }
