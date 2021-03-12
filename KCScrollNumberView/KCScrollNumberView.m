@@ -19,6 +19,7 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
 @property (nonatomic, strong) NSMutableArray *originLabels;
 @property (nonatomic, strong) NSNumber *lastValue;
 @property (nonatomic, assign) BOOL isCycle;
+@property (nonatomic, assign) BOOL isStop;
 @end
 @implementation KCScrollNumberView
 
@@ -72,6 +73,7 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
 - (void)startAnimation
 {
     self.isCycle = NO;
+    self.isStop = NO;
     [self prepareAnimations];
     if (self.scrollType == KCScrollTypeQueue) {
         [self createSortAnimationsWithIndex:self.scrollLayers.count-1 scrollLayers:[self.scrollLayers mutableCopy]];
@@ -87,7 +89,7 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
 - (void)randomCycleAnimation
 {
     NSAssert(self.scrollType == KCScrollTypeSync,@"随机滚动，仅在 KCScrollTypeSync 滚动模式才有用");
-    
+    self.isStop = NO;
     self.isCycle = YES;
     [self prepareAnimations];
     for (int i = 0; i<self.scrollLayers.count; i++) {
@@ -109,6 +111,7 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
 }
 - (void)stopAnimation
 {
+    self.isStop = YES;
     for(CALayer *layer in self.scrollLayers){
         @autoreleasepool {
             [layer removeAnimationForKey:kAniamtionKey];
@@ -272,7 +275,6 @@ static NSString *const kNormalLayerName = @"kNormalLayerName";
     
     if ([scrollLayer.name isEqualToString:kNormalLayerName])
     {
-        [self createSortAnimationsWithIndex:index-1 scrollLayers:scrollLayers];
         return;
     }
     
